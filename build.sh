@@ -1,26 +1,16 @@
 processors=$1
 if [ -z $processors ]; then
-    processors=$(nproc)
+    processors=$(($(nproc) / 2))
 fi
 
 mkdir -p build
-cd build
+cd build || exit 
 
-if [ "$(uname)" == "Darwin" ]; then
-    cmake -G "Ninja" -DLLVM_ENABLE_PROJECTS="clang" \
-	-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DDEFAULT_SYSROOT=$(xcrun --show-sdk-path) \
-        -DCMAKE_OSX_SYSROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX$(xcrun --show-sdk-version).sdk \
-        -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" \
-        -DCMAKE_INSTALL_PREFIX="../install" \
-        ../llvm
-else   
-    cmake -G "Ninja" -DLLVM_ENABLE_PROJECTS="clang" \
-	-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ \
-        -DCMAKE_BUILD_TYPE=Release -DLLVM_TARGETS_TO_BUILD="X86" \
-        -DBUILD_SHARED_LIBS=On -DCMAKE_INSTALL_PREFIX="../install" ../llvm
-fi
+cmake -G "Ninja" -DLLVM_ENABLE_PROJECTS="lld;clang" \
+-DLLVM_TARGETS_TO_BUILD="host;WebAssembly" \
+-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ \
+-DLLVM_INCLUDE_EXAMPLES=OFF -DLLVM_INCLUDE_TESTS=OFF \
+-DBUILD_SHARED_LIBS=On -DCMAKE_INSTALL_PREFIX="../install" ../llvm
 
 echo "-- Building on $(uname)"
 echo "-- Building with $processors CPU cores"
