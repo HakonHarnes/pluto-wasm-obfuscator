@@ -6,7 +6,7 @@ fi
 mkdir -p build
 cd build || exit 
 
-cmake -G "Ninja" -DLLVM_ENABLE_PROJECTS="lld" \
+cmake -G "Ninja" -DLLVM_ENABLE_PROJECTS="lld;clang" \
 -DLLVM_TARGETS_TO_BUILD="host;WebAssembly" \
 -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ \
 -DLLVM_INCLUDE_EXAMPLES=OFF -DLLVM_INCLUDE_TESTS=OFF \
